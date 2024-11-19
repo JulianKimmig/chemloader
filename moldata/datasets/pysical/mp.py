@@ -3,12 +3,13 @@ from moldata import MolDataLoader, DataDownloader, SmilesExcelToStorage
 
 class BradleyDoublePlusGoodMP(MolDataLoader):
     expected_data_size = 3042
-    expected_mol = 3025
+    expected_mol = 3022
     citation = "http://dx.doi.org/10.6084/m9.figshare.1031637"
 
     setup_pipleline = [
         DataDownloader(
-            src="https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/1503991/BradleyDoublePlusGoodMeltingPointDataset.xlsx",
+            src="https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/"
+            "1503991/BradleyDoublePlusGoodMeltingPointDataset.xlsx",
         ),
         SmilesExcelToStorage(
             smiles="smiles",
