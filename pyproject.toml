@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "chemloader"
 version = "0.1.0"
-description = "Retrieve and worlk with molecular data from multiple sources"
+description = "Retrieve and work with molecular data from multiple sources"
 authors = ["JulianKimmig <julian.kimmig@gmx.net>"]
 license = "MIT"
 readme = "README.md"
