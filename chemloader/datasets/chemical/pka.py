@@ -1,12 +1,9 @@
-from moldata import (
+from chemloader import (
     MolDataLoader,
     DataDownloader,
-    SmilesExcelToStorage,
     SmilesCsvToStorage,
-    datasets,
     UnzipFile,
 )
-import os
 
 
 class IUPAC_DissociationConstantsV1_0(MolDataLoader):
@@ -16,7 +13,8 @@ class IUPAC_DissociationConstantsV1_0(MolDataLoader):
 
     setup_pipleline = [
         DataDownloader(
-            src="https://zenodo.org/records/7236453/files/IUPAC/Dissociation-Constants-v1-0_initial-release.zip?download=1",
+            src="https://zenodo.org/records/7236453/files/IUPAC/"
+            "Dissociation-Constants-v1-0_initial-release.zip?download=1",
             raw_file_name="Dissociation-Constants-v1-0_initial-release.zip",
         ),
         UnzipFile(

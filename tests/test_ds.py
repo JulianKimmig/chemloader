@@ -3,7 +3,7 @@ from unittest import TestCase
 
 class TestDS(TestCase):
     def test_BradleyDoublePlusGoodMP(self):
-        from moldata.datasets.pysical.mp import BradleyDoublePlusGoodMP
+        from chemloader.datasets.pysical.mp import BradleyDoublePlusGoodMP
 
         loader = BradleyDoublePlusGoodMP()
         i = 0

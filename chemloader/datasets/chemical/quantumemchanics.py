@@ -1,12 +1,12 @@
 from typing import List, Tuple
-from moldata import (
+from chemloader import (
     MolDataLoader,
     DataDownloader,
     UnTarFile,
     MolToStoragePipeline,
 )
 from rdkit import Chem
-from rdkit.Chem import rdDistGeom, rdMolAlign
+from rdkit.Chem import rdDistGeom
 import os
 import numpy as np
 from tqdm import tqdm
@@ -295,8 +295,8 @@ def align_and_match(
 
     label_groups = {}
     for label in unique_labels:
-        indices_a = [i for i, l in enumerate(labels_a) if l == label]
-        indices_b = [i for i, l in enumerate(labels_b) if l == label]
+        indices_a = [i for i, _label in enumerate(labels_a) if _label == label]
+        indices_b = [i for i, _label in enumerate(labels_b) if _label == label]
         if len(indices_a) != len(indices_b):
             raise ValueError(f"Label {label} counts do not match.")
         label_groups[label] = (indices_a, indices_b)
@@ -525,7 +525,7 @@ def qm9_parse_file(file_path):
             partial_charges=partial_charges,
             atoms=atoms,
         )
-    except Exception as e:
+    except Exception:
         return None, None
 
     # Add properties

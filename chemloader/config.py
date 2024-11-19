@@ -7,14 +7,14 @@ import shutil
 import logging
 
 
-LOGGER = logging.getLogger("moldata")
+LOGGER = logging.getLogger("chemloader")
 LOGGER.setLevel(logging.INFO)
 
 LOGGER.addHandler(logging.StreamHandler())
 
 
 # define the path to the data directory
-_DATA_PATH = os.path.join(os.path.expanduser("~"), "moldata", "data")
+_DATA_PATH = os.path.join(os.path.expanduser("~"), "chemloader", "data")
 
 
 def set_data_path(path):
