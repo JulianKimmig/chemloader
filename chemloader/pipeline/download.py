@@ -134,10 +134,19 @@ class UnTarFile(SetupPipelineStep):
                     return
 
         LOGGER.info("Untarring file %s to %s", self.tar_file, self.raw_file)
-        with tarfile.open(self.tar_file, "r") as tar_ref:
-            tar_ref.extractall(self.raw_file)
+        if not os.path.exists(self.raw_file):
+            os.makedirs(self.raw_file)
 
-        # if the tar file contains only one file, replace the untarred folder with the file
+        with tarfile.open(self.tar_file, "r") as tar_ref:
+            # Get the list of members in the tar file
+            members = tar_ref.getmembers()
+            total_files = len(members)
+
+            # Initialize tqdm progress bar
+            with tqdm(total=total_files, desc="Extracting files", unit="file") as pbar:
+                for member in members:
+                    tar_ref.extract(member, path=self.raw_file)
+                    pbar.update(1)
 
         files = os.listdir(self.raw_file)
         if len(files) == 1:
