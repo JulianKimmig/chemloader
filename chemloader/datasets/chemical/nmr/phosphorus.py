@@ -1,4 +1,4 @@
-from moldata import MolDataLoader, DataDownloader, SDFToStorage, UnzipFile
+from chemloader import MolDataLoader, DataDownloader, SDFToStorage
 
 
 class Ilm_NMR_P31(MolDataLoader):

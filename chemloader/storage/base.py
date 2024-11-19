@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Tuple, Iterable, TypeVar, Generic, Iterator, TYPE_CHECKING
+from typing import Tuple, TypeVar, Generic, Iterator, TYPE_CHECKING
 from abc import ABC, abstractmethod
 
 if TYPE_CHECKING:

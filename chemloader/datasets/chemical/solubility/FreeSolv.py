@@ -1,9 +1,7 @@
-from moldata import (
+from chemloader import (
     MolDataLoader,
     DataDownloader,
-    SmilesExcelToStorage,
     SmilesJSONToStorage,
-    datasets,
     UnzipFile,
 )
 

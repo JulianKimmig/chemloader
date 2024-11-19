@@ -1,4 +1,4 @@
-from moldata import MolDataLoader, DataDownloader, SDFToStorage, UnzipFile
+from chemloader import MolDataLoader, DataDownloader, SDFToStorage, UnzipFile
 
 
 class Tox21Base(MolDataLoader):
