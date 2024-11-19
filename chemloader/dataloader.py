@@ -1,22 +1,15 @@
 from __future__ import annotations
 from typing import (
     List,
-    Dict,
     Any,
-    Union,
     Set,
     Literal,
-    Protocol,
-    TypeVar,
-    Generic,
     Iterator,
     Tuple,
     TYPE_CHECKING,
 )
-from abc import ABC, abstractmethod
+from abc import ABC
 import os
-from tqdm import tqdm
-import requests
 from rdkit import Chem
 import json
 from statistics import mean, median

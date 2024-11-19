@@ -1,4 +1,4 @@
-from moldata import MolDataLoader, DataDownloader, SmilesExcelToStorage
+from chemloader import MolDataLoader, DataDownloader, SmilesExcelToStorage
 
 
 class BradleyDoublePlusGoodMP(MolDataLoader):
