@@ -12,10 +12,11 @@ tqdm = "*"
 requests = "*"
 pandas = "*"
 rdkit = "*"
-openpyxl = "^3.1.5"
+openpyxl = "*"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
+pre-commit = "*"
 
 [build-system]
 requires = ["poetry-core"]
