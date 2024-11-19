@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "moldata"
+version = "0.1.0"
+description = "Retrieve and worlk with molecular data from multiple sources"
+authors = ["JulianKimmig <julian.kimmig@gmx.net>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+tqdm = "*"
+requests = "*"
+pandas = "*"
+rdkit = "*"
+openpyxl = "^3.1.5"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
