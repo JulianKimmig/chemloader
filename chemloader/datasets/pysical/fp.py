@@ -4,7 +4,7 @@ from chemloader import MolDataLoader, DataDownloader, SmilesCsvToStorage
 class MorganFlashPoint(MolDataLoader):
     expected_data_size = 14696
     expected_mol = 8584
-    citation = "https://doi.org/10.1039/D0SC06583A"
+    citation = "https://doi.org/10.1002/minf.201900101"
 
     setup_pipleline = [
         DataDownloader(
