@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "chemloader"
-version = "0.1.1"
+version = "0.1.2"
 description = "Retrieve and work with molecular data from multiple sources"
 authors = ["JulianKimmig <julian.kimmig@gmx.net>"]
 license = "MIT"
@@ -17,6 +17,7 @@ openpyxl = "*"
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 pre-commit = "*"
+ipykernel = "^6.29.5"
 
 [build-system]
 requires = ["poetry-core"]
