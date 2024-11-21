@@ -386,36 +386,42 @@ def map_mol_to_xyz(mol: Chem.Mol, xyz: List[Tuple[str, float, float, float]]):
     if sorted(labels_a) != sorted(labels_b):
         raise ValueError("Atom labels do not match.")
 
-    rdDistGeom.EmbedMolecule(mol)
+    for seed in range(10):
+        try:
+            rdDistGeom.EmbedMolecule(mol, randomSeed=seed)
+            conf = mol.GetConformer()
 
-    conf = mol.GetConformer()
-    coords_b = np.array(
-        [list(conf.GetAtomPosition(i)) for i in range(mol.GetNumAtoms())]
-    )
+            coords_b = np.array(
+                [list(conf.GetAtomPosition(i)) for i in range(mol.GetNumAtoms())]
+            )
 
-    (
-        correspondences,
-        rotation_matrix,
-        centroid_a,
-        centroid_b,
-        final_rmsd,
-    ) = align_and_match(labels_a, coords_a, labels_b, coords_b)
-    # print("correspondences", correspondences)
-    # print("rotation_matrix", rotation_matrix)
-    # print("centroid_a", centroid_a)
-    # print("centroid_b", centroid_b)
-    # print("final_rmsd", final_rmsd)
+            (
+                correspondences,
+                rotation_matrix,
+                centroid_a,
+                centroid_b,
+                final_rmsd,
+            ) = align_and_match(labels_a, coords_a, labels_b, coords_b)
+            # print("correspondences", correspondences)
+            # print("rotation_matrix", rotation_matrix)
+            # print("centroid_a", centroid_a)
+            # print("centroid_b", centroid_b)
+            # print("final_rmsd", final_rmsd)
 
-    atom_map = {atom.GetIdx(): None for atom in mol.GetAtoms()}
+            atom_map = {atom.GetIdx(): None for atom in mol.GetAtoms()}
 
-    for label, pairs in correspondences.items():
-        for ia, ib in pairs:
-            atom_map[ia] = ib
+            for label, pairs in correspondences.items():
+                for ia, ib in pairs:
+                    atom_map[ia] = ib
 
-    for atomidx, xyzidx in atom_map.items():
-        conf.SetAtomPosition(atomidx, coords_a[xyzidx])
+            for atomidx, xyzidx in atom_map.items():
+                conf.SetAtomPosition(atomidx, coords_a[xyzidx])
 
-    return mol, atom_map
+            return mol, atom_map
+        except Exception:
+            continue
+
+    return None, None
 
 
 def qm9_make_molecule(
@@ -428,6 +434,9 @@ def qm9_make_molecule(
         raise ValueError("Invalid SMILES string provided.")
 
     mol, atom_map = map_mol_to_xyz(mol, atoms)
+
+    if mol is None:
+        raise ValueError("Failed to map molecule to XYZ coordinates.")
 
     # Add properties
     positions = np.array(
@@ -609,7 +618,7 @@ class QM9(MolDataLoader):
 
     citation = "https://doi.org/10.6084/m9.figshare.c.978904.v5"
     expected_data_size = 133_885
-    expected_mol = 131_473
+    expected_mol = 133_885
 
     setup_pipleline = [
         DataDownloader(
@@ -619,3 +628,10 @@ class QM9(MolDataLoader):
         UnTarFile(),
         ReadQM9Files(),
     ]
+
+    def is_ready(self):
+        if (
+            len(self.storage_instance) / self.expected_mol >= 0.98
+        ):  # depending on the system not all molecules can be generated, but 98% should be a good indicator
+            return True
+        return super().is_ready()
