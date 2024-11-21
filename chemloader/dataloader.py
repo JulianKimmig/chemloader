@@ -155,8 +155,12 @@ class MolDataLoader(DataLoader):
 
 class MergedDataLoader(DataLoader):
     def __init__(self, loaders: List[DataLoader]):
-        super().__init__()
         self.loaders = loaders
+        super().__init__()
+
+    @property
+    def expected_data_size(self):
+        return sum(loader.expected_data_size for loader in self.loaders)
 
     def setup(self, force=False):
         for loader in self.loaders:
