@@ -96,8 +96,13 @@ def check_atom_properties(mol, key, storage_instance, index):
     if oldmol is None:
         return mol
 
-    oldatomprops = [a.GetPropsAsDict() for a in oldmol.GetAtoms()]
-    if all(len(a.GetPropsAsDict()) == 0 for a in mol.GetAtoms()):  # No atom properties
+    all_oldatomprops = [
+        {
+            k: v for k, v in a.GetPropsAsDict().items() if not k.startswith("_")
+        }  # ignore internal properties
+        for a in oldmol.GetAtoms()
+    ]
+    if all(len(a) == 0 for a in all_oldatomprops):  # No atom properties
         return mol
     if MolToSmiles(oldmol) != MolToSmiles(mol):
         raise ValueError(
@@ -120,7 +125,7 @@ def check_atom_properties(mol, key, storage_instance, index):
     ):
         raise ValueError(f"Atom symbol mismatch for {key}")
 
-    for oldatom, newatom in zip(oldatoms, newatoms):
+    for oldatomprops, newatom in zip(all_oldatomprops, newatoms):
         newatomprops = newatom.GetPropsAsDict()
 
         for k in oldatomprops:
