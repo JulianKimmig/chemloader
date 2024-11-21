@@ -153,5 +153,24 @@ class MolDataLoader(DataLoader):
                     )
 
 
-class AtomDataLoader(MolDataLoader):
-    expected_mol = None
+class MergedDataLoader(DataLoader):
+    def __init__(self, loaders: List[DataLoader]):
+        super().__init__()
+        self.loaders = loaders
+
+    def setup(self, force=False):
+        for loader in self.loaders:
+            loader.setup(force=force)
+
+    def is_ready(self):
+        for loader in self.loaders:
+            if not loader.is_ready():
+                return False
+        return True
+
+    def __iter__(self):
+        for loader in self.loaders:
+            yield from loader
+
+    def __len__(self):
+        return sum(len(loader) for loader in self.loaders)
