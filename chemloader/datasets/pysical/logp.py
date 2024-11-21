@@ -3,7 +3,7 @@ from chemloader import MolDataLoader, DataDownloader, SmilesExcelToStorage
 
 class LogPNadinUlrich(MolDataLoader):
     expected_data_size = 12709
-    expected_mol = 12709
+    expected_mol = 5529
     citation = "https://doi.org/10.1038/s42004-021-00528-9"
 
     setup_pipleline = [
