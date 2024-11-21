@@ -110,7 +110,9 @@ class MolDataLoader(DataLoader):
     def is_ready(self):
         if len(self.storage_instance) == 0:
             return False
-        if len(self.storage_instance) != self.expected_mol:
+
+        lstore = len(self.storage_instance)
+        if lstore < self.expected_mol:
             LOGGER.warning(
                 "DataLoader %s has %s/%s molecules",
                 self.__class__.__name__,
@@ -118,6 +120,7 @@ class MolDataLoader(DataLoader):
                 self.expected_mol,
             )
             return False
+        self.expected_mol = lstore
         return True
 
     def __len__(self):
@@ -169,7 +172,7 @@ class MolDataLoader(DataLoader):
                     else:
                         propdata.append(val)
                 elif handle_missmatched == "ignore":
-                    propdata.append(None)
+                    propdata.append([None] if return_list else None)
                 elif MISSMATCH_PREFIX + prop in propdict:
                     val = json.loads(propdict[MISSMATCH_PREFIX + prop])
                     if return_list:
@@ -183,7 +186,7 @@ class MolDataLoader(DataLoader):
                             f"Unknown value for handle_missmatched: {handle_missmatched}"
                         )
                 else:
-                    propdata.append(None)
+                    propdata.append([None] if return_list else None)
 
             yield mol, propdata
 
