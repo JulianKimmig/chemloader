@@ -87,6 +87,97 @@ def check_mol_properties(mol, key, storage_instance, index):
         return mol
 
 
+def check_atom_properties(mol, key, storage_instance, index):
+    try:
+        oldmol = storage_instance.get(key)
+    except KeyError:
+        return mol
+
+    if oldmol is None:
+        return mol
+
+    all_oldatomprops = [
+        {
+            k: v for k, v in a.GetPropsAsDict().items() if not k.startswith("_")
+        }  # ignore internal properties
+        for a in oldmol.GetAtoms()
+    ]
+    if all(len(a) == 0 for a in all_oldatomprops):  # No atom properties
+        return mol
+    if MolToSmiles(oldmol) != MolToSmiles(mol):
+        raise ValueError(
+            f"SMILES mismatch for {key}: {MolToSmiles(RemoveHs(oldmol))} != {MolToSmiles(RemoveHs(mol))}"
+        )
+
+    # compare atom order
+
+    oldatoms = list(oldmol.GetAtoms())
+    newatoms = list(mol.GetAtoms())
+
+    if len(oldatoms) != len(newatoms):
+        raise ValueError(
+            f"Atom count mismatch for {key}: {len(oldatoms)} != {len(newatoms)}"
+        )
+
+    if any(
+        oldatom.GetSymbol() != newatom.GetSymbol()
+        for oldatom, newatom in zip(oldatoms, newatoms)
+    ):
+        raise ValueError(f"Atom symbol mismatch for {key}")
+
+    for oldatomprops, newatom in zip(all_oldatomprops, newatoms):
+        newatomprops = newatom.GetPropsAsDict()
+
+        for k in oldatomprops:
+            # Check if property is in molprops and marked as missmatched
+            missmatch_key = MISSMATCH_PREFIX + k
+            if missmatch_key in oldatomprops and k in newatomprops:
+                # Add new value to missmatched list if not already there
+                old_missmatched = json.loads(oldatomprops[missmatch_key])
+                old_missmatched[index] = newatomprops[k]
+                old_missmatched.append(newatomprops[k])
+
+                # Set new missmatched list and remove property from mol
+                newatom.SetProp(
+                    missmatch_key,
+                    json.dumps(old_missmatched),
+                )
+                newatom.ClearProp(k)
+
+            # Check if property is in molprops and missmatches
+            elif k in newatomprops and oldatomprops[k] != newatomprops[k]:
+                LOGGER.warning(
+                    "Missmatched properties for %s: %s from %s to %s",
+                    key,
+                    k,
+                    oldatomprops[k],
+                    newatomprops[k],
+                )
+                # set new missmatched list and remove property from newatom
+                newatom.SetProp(
+                    missmatch_key,
+                    json.dumps([newatomprops[k], oldatomprops[k]]),
+                )
+                # newatom.ClearProp(k) # Remove property from newatom not needed since it will be overwritten
+                newatom.ClearProp(k)  # Remove property from newatom
+
+            # the property is not in the molprops, or it matches
+            else:
+                if isinstance(oldatomprops[k], str):
+                    newatom.SetProp(k, oldatomprops[k])
+                elif isinstance(oldatomprops[k], int):
+                    newatom.SetIntProp(k, oldatomprops[k])
+                elif isinstance(oldatomprops[k], float):
+                    newatom.SetDoubleProp(k, oldatomprops[k])
+                elif isinstance(oldatomprops[k], bool):
+                    newatom.SetBoolProp(k, oldatomprops[k])
+                else:
+                    raise ValueError(
+                        f"Unknown property type for {k}: {type(oldatomprops[k])}"
+                    )
+    return mol
+
+
 def fixed_length_hash(input_string: str, length: int) -> str:
     """
     Hash an arbitrary string to a fixed-length hashed version using alphanumeric characters.
@@ -126,13 +217,17 @@ class MolToStoragePipeline(SetupPipelineStep):
         key_prop=None,
         leading_zeros=None,
         mol_property_checks=None,
+        atoms_property_checks=None,
         fallback: Literal[
             "index", "smiles", "inchikey", "smileshash32"
         ] = "smileshash32",
     ):
         if mol_property_checks is None:
             mol_property_checks = [check_mol_properties]
+        if atoms_property_checks is None:
+            atoms_property_checks = [check_atom_properties]
         self.mol_property_checks = mol_property_checks
+        self.atoms_property_checks = atoms_property_checks
         self.key_prop = key_prop
         self.leading_zeros_crushed = False
         self.leading_zeros = leading_zeros
@@ -166,6 +261,9 @@ class MolToStoragePipeline(SetupPipelineStep):
         if key is None:
             key = self.get_key(mol, index=index)
         for check in self.mol_property_checks:
+            mol = check(mol, key, dataloader.storage_instance, index=index)
+
+        for check in self.atoms_property_checks:
             mol = check(mol, key, dataloader.storage_instance, index=index)
 
         dataloader.storage_instance.set(key, mol)
