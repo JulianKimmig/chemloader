@@ -152,6 +152,41 @@ class MolDataLoader(DataLoader):
                         f"Unknown value for handle_missmatched: {handle_missmatched}"
                     )
 
+    def iterate_with_atom_property(
+        self,
+        prop: str,
+        handle_missmatched: Literal["ignore", "mean", "median"] = "mean",
+        return_list: bool = False,
+    ) -> Iterator[Tuple[Chem.Mol, Any]]:
+        for mol in self:
+            propdata = []
+            for atom in mol.GetAtoms():
+                propdict = atom.GetPropsAsDict()
+                if prop in propdict:
+                    val = propdict[prop]
+                    if return_list:
+                        propdata.append([val])
+                    else:
+                        propdata.append(val)
+                elif handle_missmatched == "ignore":
+                    propdata.append(None)
+                elif MISSMATCH_PREFIX + prop in propdict:
+                    val = json.loads(propdict[MISSMATCH_PREFIX + prop])
+                    if return_list:
+                        propdata.append(val)
+                    elif handle_missmatched == "mean":
+                        propdata.append(mean(val))
+                    elif handle_missmatched == "median":
+                        propdata.append(median(val))
+                    else:
+                        raise ValueError(
+                            f"Unknown value for handle_missmatched: {handle_missmatched}"
+                        )
+                else:
+                    propdata.append(None)
+
+            yield mol, propdata
+
 
 class MergedDataLoader(DataLoader):
     def __init__(self, loaders: List[DataLoader]):
