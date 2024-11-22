@@ -87,6 +87,15 @@ def check_mol_properties(mol, key, storage_instance, index):
         return mol
 
 
+IGNORED_ATOM_PROPERTIES = {
+    "molAtomMapNumber": 0,
+    "molExactChangeFlag": 0,
+    "molStereoCare": 0,
+    "molParity": 0,
+    "molInversionFlag": 0,
+}
+
+
 def check_atom_properties(mol, key, storage_instance, index):
     try:
         oldmol = storage_instance.get(key)
@@ -98,7 +107,9 @@ def check_atom_properties(mol, key, storage_instance, index):
 
     all_oldatomprops = [
         {
-            k: v for k, v in a.GetPropsAsDict().items() if not k.startswith("_")
+            k: v
+            for k, v in a.GetPropsAsDict().items()
+            if not k.startswith("_") and k not in IGNORED_ATOM_PROPERTIES
         }  # ignore internal properties
         for a in oldmol.GetAtoms()
     ]
@@ -123,6 +134,7 @@ def check_atom_properties(mol, key, storage_instance, index):
         oldatom.GetSymbol() != newatom.GetSymbol()
         for oldatom, newatom in zip(oldatoms, newatoms)
     ):
+        print(all_oldatomprops)
         raise ValueError(f"Atom symbol mismatch for {key}")
 
     for oldatomprops, newatom in zip(all_oldatomprops, newatoms):
