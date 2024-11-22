@@ -619,6 +619,7 @@ class QM9(MolDataLoader):
     citation = "https://doi.org/10.6084/m9.figshare.c.978904.v5"
     expected_data_size = 133_885
     expected_mol = 133_885
+    allowed_size_derivation = 0.02  # 98% have to be created
 
     setup_pipleline = [
         DataDownloader(
@@ -628,10 +629,3 @@ class QM9(MolDataLoader):
         UnTarFile(),
         ReadQM9Files(),
     ]
-
-    def is_ready(self):
-        if (
-            len(self.storage_instance) / self.expected_mol >= 0.98
-        ):  # depending on the system not all molecules can be generated, but 98% should be a good indicator
-            return True
-        return super().is_ready()

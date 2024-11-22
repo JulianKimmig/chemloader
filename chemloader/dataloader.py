@@ -97,6 +97,8 @@ class MolDataLoader(DataLoader):
     expected_mol = None
     storage = MolPicklStorage
 
+    allowed_size_derivation = 0.0
+
     def __init__(
         self,
         storage=None,
@@ -112,6 +114,13 @@ class MolDataLoader(DataLoader):
             return False
 
         lstore = len(self.storage_instance)
+
+        if lstore / self.expected_mol >= (
+            1 - self.allowed_size_derivation
+        ):  # in some systems not all mols can be created
+            self.expected_mol = lstore
+            return True
+
         if lstore < self.expected_mol:
             LOGGER.warning(
                 "DataLoader %s has %s/%s molecules",
@@ -124,6 +133,8 @@ class MolDataLoader(DataLoader):
         return True
 
     def __len__(self):
+        if self.is_ready():
+            return len(self.storage_instance)
         return self.expected_mol
 
     def iterate_with_property(
