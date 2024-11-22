@@ -133,7 +133,8 @@ class MolDataLoader(DataLoader):
         return True
 
     def __len__(self):
-        self.is_ready()
+        if self.is_ready():
+            return len(self.storage_instance)
         return self.expected_mol
 
     def iterate_with_property(
