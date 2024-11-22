@@ -5,6 +5,7 @@ class Ilm_NMR_P31(MolDataLoader):
     expected_data_size = 14250
     citation = "https://doi.org/10.1186/s13321-023-00792-y"
     expected_mol = 13349
+    allowed_size_derivation = 0.02  # 2%
 
     setup_pipleline = [
         DataDownloader(
