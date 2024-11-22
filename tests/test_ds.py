@@ -46,3 +46,14 @@ class TestDS(TestCase):
             self.assertIsInstance(mol, Mol)
             i += 1
         self.assertEqual(i, len(loader))
+
+    def test_Ilm_NMR_P31(self):
+        from chemloader.datasets.chemical.nmr.phosphorus import Ilm_NMR_P31
+
+        loader = Ilm_NMR_P31()
+        i = 0
+        for mol in loader:
+            i += 1
+            self.assertIsInstance(mol, Mol)
+
+        self.assertEqual(i, loader.expected_mol)
